@@ -29,10 +29,22 @@ const updateTask = async (req, res) => {
   }
 };
 
+const removeTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedTask = await taskServices.deleteTask(id);
+
+    return res.status(200).json(deletedTask);
+  } catch (error) {
+    return res.status(error.name).json({ message: error.message });    
+  }
+};
+
 const taskControllers = {
   createTask,
   getAllTasks,
   updateTask,
+  removeTask,
 };
 
 export default taskControllers;

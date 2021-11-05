@@ -1,4 +1,4 @@
-import { ObjectId } from 'bson';
+import { ObjectId } from 'mongodb';
 import CustomError from '../errors/CustomError.js';
 import connection from './connections.js';
 
@@ -60,9 +60,22 @@ const updateTask = async (id, task) => {
   }
 };
 
+const removeTask = async (id) => {
+  try {
+    const db = await connection();
+    const deletedTask = await db
+      .collection(COLLECTION_NAME)
+      .findOneAndDelete({ _id: ObjectId(id) });
+    return deletedTask.value;
+  } catch (error) {
+    throw new CustomError(serverErrorMsg, 500);
+  }
+};
+
 const tasksModel = {
   createTask,
   findTasks,
   updateTask,
+  removeTask,
 };
 export default tasksModel;
