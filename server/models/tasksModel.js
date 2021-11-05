@@ -1,7 +1,9 @@
+import { ObjectId } from 'bson';
 import CustomError from '../errors/CustomError.js';
 import connection from './connections.js';
 
 const COLLECTION_NAME = 'tasks';
+const serverErrorMsg = 'server misbehavior';
 
 const createTask = async (task) => {
   try {
@@ -19,7 +21,7 @@ const createTask = async (task) => {
     return result;
   } catch (error) {
     console.log(error.message);
-    throw new CustomError('server misbehavior', 500);
+    throw new CustomError(serverErrorMsg, 500);
   }
 };
 
@@ -30,11 +32,37 @@ const findTasks = async (query = {}) => {
     return tasks;
   } catch (error) {
     console.log(error.message);
-    throw new CustomError('server misbehavior', 500);
+    throw new CustomError(serverErrorMsg, 500);
   }
 };
+
+const updateTask = async (id, task) => {
+  try {
+    const date = new Date().toLocaleDateString('pt-br', {
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+    });
+    const db = await connection();
+    const updatedTask = await db
+      .collection(COLLECTION_NAME)
+      .replaceOne({ _id: ObjectId(id) }, { ...task, date });
+
+    if (updatedTask.matchedCount === 0) {
+      throw new CustomError('task not found', 404);
+    }
+
+    const result = { _id: id, ...task, date };
+    return result;
+  } catch (error) {
+    console.log(error.message);
+    throw new CustomError(serverErrorMsg, 500);
+  }
+};
+
 const tasksModel = {
   createTask,
   findTasks,
+  updateTask,
 };
 export default tasksModel;

@@ -41,9 +41,29 @@ const findTasks = async (id) => {
   return result;
 }; 
 
+const updateTasks = async (id, task) => {
+  const { title, status } = task;
+
+  if (!ObjectId.isValid(id)) {
+    throw new CustomError('invalid Id', 422);
+  }
+
+  if (!title || !status) {
+    throw new CustomError('Title and status can not be empty', 422);
+  }
+
+  if (!stringValidation(title) || !stringValidation(status)) {
+    throw new CustomError('Title and status must be of type "string"', 422); 
+  }
+
+  const updatedTask = await tasksModel.updateTask(id, task);
+  return updatedTask;
+};
+
 const taskServices = {
   createTask,
   findTasks,
+  updateTasks,
 };
 
 export default taskServices;

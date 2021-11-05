@@ -18,9 +18,21 @@ const getAllTasks = async (_req, res) => {
   }
 };
 
+const updateTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const task = req.body;
+    const updatedTask = await taskServices.updateTasks(id, task);
+    return res.status(200).json(updatedTask);
+  } catch (error) {
+    return res.status(error.name).json({ message: error.message });
+  }
+};
+
 const taskControllers = {
   createTask,
   getAllTasks,
+  updateTask,
 };
 
 export default taskControllers;
